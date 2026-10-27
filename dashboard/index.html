@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>LogWatch | Real-Time Monitoring</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">
+                LW
+            </div>
+
+            <div>
+                <h1>LogWatch</h1>
+                <span>REAL-TIME MONITOR</span>
+            </div>
+        </div>
+
+        <nav class="nav">
+
+            <a href="#overview" class="nav-item active">
+                <span>◈</span>
+                Overview
+            </a>
+
+            <a href="#logs" class="nav-item">
+                <span>≡</span>
+                Live Logs
+            </a>
+
+            <a href="#analytics" class="nav-item">
+                <span>⌁</span>
+                Analytics
+            </a>
+
+            <a href="#ingestion" class="nav-item">
+                <span>⇩</span>
+                Log Ingestion
+            </a>
+
+            <a href="#alerts" class="nav-item">
+                <span>⚠</span>
+                Alerts
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="connection-box">
+
+                <div class="connection-dot" id="connectionDot"></div>
+
+                <div>
+                    <strong id="connectionText">
+                        Connecting...
+                    </strong>
+
+                    <small>
+                        API STATUS
+                    </small>
+                </div>
+
+            </div>
+
+            <div class="version">
+                LogWatch 2.0
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div>
+                <p class="eyebrow">
+                    SYSTEM MONITORING / CORE
+                </p>
+
+                <h2>
+                    Operations Dashboard
+                </h2>
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="live-indicator">
+                    <span></span>
+                    LIVE
+                </div>
+
+                <div class="clock" id="clock">
+                    --:--:--
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- OVERVIEW -->
+        <section id="overview">
+
+            <div class="section-title">
+
+                <div>
+                    <span>01</span>
+                    <h3>System Overview</h3>
+                </div>
+
+                <p>
+                    Real-time log intelligence
+                </p>
+
+            </div>
+
+
+            <!-- METRICS -->
+            <div class="metrics-grid">
+
+                <div class="metric-card">
+
+                    <div class="metric-top">
+                        <span>Total Logs</span>
+                        <b>Σ</b>
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="totalLogs"
+                    >
+                        0
+                    </div>
+
+                    <div class="metric-footer">
+                        All captured events
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card info-card">
+
+                    <div class="metric-top">
+                        <span>Information</span>
+                        <b>i</b>
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="infoLogs"
+                    >
+                        0
+                    </div>
+
+                    <div class="metric-footer">
+                        Normal events
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card warning-card">
+
+                    <div class="metric-top">
+                        <span>Warnings</span>
+                        <b>!</b>
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="warningLogs"
+                    >
+                        0
+                    </div>
+
+                    <div class="metric-footer">
+                        Requires attention
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card error-card">
+
+                    <div class="metric-top">
+                        <span>Errors</span>
+                        <b>×</b>
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="errorLogs"
+                    >
+                        0
+                    </div>
+
+                    <div class="metric-footer">
+                        Critical events
+                    </div>
+
+                </div>
+
+
+                <div class="metric-card exception-card">
+
+                    <div class="metric-top">
+                        <span>Exceptions</span>
+                        <b>!</b>
+                    </div>
+
+                    <div
+                        class="metric-value"
+                        id="exceptionLogs"
+                    >
+                        0
+                    </div>
+
+                    <div class="metric-footer">
+                        Runtime exceptions
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ANALYTICS -->
+            <div
+                id="analytics"
+                class="analytics-grid"
+            >
+
+                <div class="panel chart-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-label">
+                                TELEMETRY
+                            </span>
+
+                            <h3>
+                                Log Activity
+                            </h3>
+                        </div>
+
+                        <span class="status-chip">
+                            LIVE
+                        </span>
+
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="logChart"></canvas>
+                    </div>
+
+                </div>
+
+
+                <!-- HEALTH -->
+                <div class="panel health-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-label">
+                                SYSTEM
+                            </span>
+
+                            <h3>
+                                System Health
+                            </h3>
+                        </div>
+
+                    </div>
+
+
+                    <div class="health-ring">
+
+                        <svg
+                            viewBox="0 0 120 120"
+                        >
+
+                            <circle
+                                class="ring-bg"
+                                cx="60"
+                                cy="60"
+                                r="50"
+                            />
+
+                            <circle
+                                class="ring-progress"
+                                id="healthRing"
+                                cx="60"
+                                cy="60"
+                                r="50"
+                            />
+
+                        </svg>
+
+                        <div class="health-center">
+
+                            <strong id="healthScore">
+                                0
+                            </strong>
+
+                            <span>/ 100</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="health-status"
+                        id="healthStatus"
+                    >
+                        CHECKING
+                    </div>
+
+
+                    <div class="health-meta">
+
+                        <span>
+                            <i></i>
+                            System status
+                        </span>
+
+                        <span id="healthMessage">
+                            Waiting for API
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- LOG INGESTION -->
+        <section
+            id="ingestion"
+            class="section-block"
+        >
+
+            <div class="section-title">
+
+                <div>
+                    <span>02</span>
+                    <h3>Log Ingestion</h3>
+                </div>
+
+                <p>
+                    Feed events into LogWatch
+                </p>
+
+            </div>
+
+
+            <div class="ingestion-grid">
+
+                <!-- SINGLE LOG -->
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-label">
+                                EVENT
+                            </span>
+
+                            <h3>
+                                Add Log Event
+                            </h3>
+                        </div>
+
+                    </div>
+
+
+                    <form id="singleLogForm">
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+
+                                <label>
+                                    LEVEL
+                                </label>
+
+                                <select id="singleLevel">
+
+                                    <option value="INFO">
+                                        INFO
+                                    </option>
+
+                                    <option value="WARNING">
+                                        WARNING
+                                    </option>
+
+                                    <option value="ERROR">
+                                        ERROR
+                                    </option>
+
+                                    <option value="EXCEPTION">
+                                        EXCEPTION
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="form-group">
+
+                                <label>
+                                    MESSAGE
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="singleMessage"
+                                    placeholder="Enter log message..."
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-btn"
+                        >
+                            + ADD EVENT
+                        </button>
+
+                    </form>
+
+
+                    <div
+                        id="singleResult"
+                        class="result-message"
+                    ></div>
+
+                </div>
+
+
+                <!-- BULK LOG -->
+                <div class="panel bulk-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-label">
+                                BATCH INGESTION
+                            </span>
+
+                            <h3>
+                                Bulk Log Input
+                            </h3>
+                        </div>
+
+                        <span class="ready-chip">
+                            ● READY
+                        </span>
+
+                    </div>
+
+
+                    <p class="description">
+                        Paste multiple logs using the format:
+                    </p>
+
+                    <div class="format-box">
+                        YYYY-MM-DD HH:MM:SS LEVEL MESSAGE
+                    </div>
+
+
+                    <textarea
+                        id="bulkLogInput"
+                        class="bulk-textarea"
+                        placeholder="2026-10-04 10:40:01 INFO Application started successfully
+2026-10-04 10:40:15 INFO User login successful
+2026-10-04 10:41:00 WARNING Memory usage exceeded 75 percent
+2026-10-04 10:41:30 ERROR Database connection failed
+2026-10-04 10:42:00 ERROR Payment service failed"
+                    ></textarea>
+
+
+                    <div class="bulk-actions">
+
+                        <button
+                            id="processBulkLogs"
+                            class="primary-btn"
+                        >
+                            ⚡ PROCESS LOGS
+                        </button>
+
+                        <button
+                            id="clearBulkLogs"
+                            class="secondary-btn"
+                        >
+                            CLEAR
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="bulkResult"
+                        class="bulk-result"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- LIVE LOGS -->
+        <section
+            id="logs"
+            class="section-block"
+        >
+
+            <div class="section-title">
+
+                <div>
+                    <span>03</span>
+                    <h3>Live Log Stream</h3>
+                </div>
+
+                <p>
+                    Latest captured events
+                </p>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="toolbar">
+
+                    <div class="search-box">
+
+                        <span>⌕</span>
+
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="Search logs..."
+                        >
+
+                    </div>
+
+
+                    <select id="levelFilter">
+
+                        <option value="ALL">
+                            ALL LEVELS
+                        </option>
+
+                        <option value="INFO">
+                            INFO
+                        </option>
+
+                        <option value="WARNING">
+                            WARNING
+                        </option>
+
+                        <option value="ERROR">
+                            ERROR
+                        </option>
+
+                        <option value="EXCEPTION">
+                            EXCEPTION
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="log-table-wrapper">
+
+                    <table>
+
+                        <thead>
+
+                        <tr>
+                            <th>TIME</th>
+                            <th>LEVEL</th>
+                            <th>MESSAGE</th>
+                        </tr>
+
+                        </thead>
+
+                        <tbody id="logTableBody">
+
+                        <tr>
+                            <td colspan="3">
+                                Loading logs...
+                            </td>
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ERRORS + ALERTS -->
+        <section
+            id="alerts"
+            class="section-block"
+        >
+
+            <div class="section-title">
+
+                <div>
+                    <span>04</span>
+                    <h3>Threat Intelligence</h3>
+                </div>
+
+                <p>
+                    Errors and active alerts
+                </p>
+
+            </div>
+
+
+            <div class="bottom-grid">
+
+                <!-- TOP ERRORS -->
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-label">
+                                ANALYSIS
+                            </span>
+
+                            <h3>
+                                Top Errors
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="topErrors"
+                        class="error-list"
+                    >
+                        Loading...
+                    </div>
+
+                </div>
+
+
+                <!-- ALERTS -->
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <span class="panel-label">
+                                SECURITY
+                            </span>
+
+                            <h3>
+                                Active Alerts
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <div
+                        id="alertsList"
+                        class="alerts-list"
+                    >
+                        Checking...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+
+            <span>
+                LOGWATCH ENGINE
+            </span>
+
+            <span>
+                CORE JAVA • SPRING BOOT • REAL-TIME ANALYTICS
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>

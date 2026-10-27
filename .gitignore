@@ -6,3 +6,22 @@ out/
 .env
 
 *.log
+# Local logs and runtime state
+logs/
+*.position
+
+# Java build output
+target/
+**/target/
+
+# Local secrets
+.env
+*.key
+
+# Local archives, backups and diagnostic files
+*.zip
+*.backup
+startup-error.txt
+
+# Generated files
+**/target/
